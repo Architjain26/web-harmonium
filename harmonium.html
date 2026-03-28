@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Harmonium</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0a06;
+    --surface: #1a1208;
+    --surface2: #241a0d;
+    --wood-light: #8b5e2d;
+    --wood-mid: #6b4520;
+    --wood-dark: #3d2510;
+    --gold: #c9922a;
+    --gold-light: #e8b84b;
+    --gold-dim: #8b6520;
+    --ivory: #f5edd8;
+    --ivory-shadow: #d4c9a8;
+    --ebony: #1a1208;
+    --ebony-top: #2a1f10;
+    --white-key-pressed: #e0d5b5;
+    --black-key-pressed: #3a2f18;
+    --text: #e8d5a0;
+    --text-dim: #8b7550;
+    --accent: #d4922a;
+    --reed-glow: rgba(201, 146, 42, 0.15);
+    --shadow: rgba(0,0,0,0.8);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    min-height: 100vh;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(100,60,10,0.25) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.008) 3px, rgba(255,255,255,0.008) 4px);
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 1rem;
+    position: relative;
+  }
+  header::after {
+    content: '';
+    display: block;
+    width: 60%;
+    max-width: 500px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), var(--gold), var(--gold-dim), transparent);
+    margin: 1.2rem auto 0;
+  }
+  .title-en {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    color: var(--gold-light);
+    text-shadow: 0 0 40px rgba(201,146,42,0.5), 0 2px 8px rgba(0,0,0,0.9);
+  }
+  .title-hi {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    margin-top: 0.3rem;
+    font-style: italic;
+  }
+
+  /* ── Main instrument body ── */
+  .instrument-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 3rem;
+  }
+
+  .harmonium-body {
+    background:
+      linear-gradient(180deg, #2a1d0f 0%, #1e1508 40%, #160f06 100%);
+    border-radius: 14px;
+    border: 2px solid var(--wood-mid);
+    box-shadow:
+      0 0 0 1px rgba(201,146,42,0.12),
+      0 8px 60px rgba(0,0,0,0.9),
+      inset 0 1px 0 rgba(201,146,42,0.2),
+      inset 0 -1px 0 rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+
+  /* ── Reed grill decoration ── */
+  .grill-bar {
+    height: 28px;
+    background: linear-gradient(90deg,
+      var(--wood-dark) 0%, var(--wood-mid) 10%, var(--wood-dark) 20%,
+      var(--wood-mid) 30%, var(--wood-dark) 50%,
+      var(--wood-mid) 70%, var(--wood-dark) 80%,
+      var(--wood-mid) 90%, var(--wood-dark) 100%
+    );
+    position: relative;
+    border-bottom: 1px solid rgba(201,146,42,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .grill-hole {
+    width: 4px; height: 16px;
+    background: rgba(0,0,0,0.8);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,1);
+  }
+
+  /* ── Controls row ── */
+  .controls-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    background: rgba(201,146,42,0.1);
+    border-bottom: 1px solid rgba(201,146,42,0.2);
+  }
+  .ctrl-group {
+    flex: 1;
+    min-width: 140px;
+    background: var(--surface);
+    padding: 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .ctrl-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    font-weight: 500;
+  }
+
+  /* Slider */
+  .slider-wrap { position: relative; }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold) var(--pct, 80%), rgba(255,255,255,0.08) 0);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, var(--gold-light), var(--gold));
+    box-shadow: 0 0 8px rgba(201,146,42,0.6), 0 2px 4px rgba(0,0,0,0.6);
+    cursor: grab;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  input[type=range]::-webkit-slider-thumb:active { cursor: grabbing; }
+
+  /* Stepper */
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .stepper-val {
+    flex: 1;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+  .step-btn {
+    width: 26px; height: 26px;
+    background: linear-gradient(145deg, var(--surface2), var(--surface));
+    border: 1px solid var(--wood-mid);
+    border-radius: 4px;
+    color: var(--gold);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    font-family: 'DM Mono', monospace;
+  }
+  .step-btn:hover { background: var(--wood-mid); color: var(--gold-light); }
+  .step-btn:active { transform: scale(0.92); }
+
+  /* Select */
+  .ctrl-select {
+    background: var(--surface2);
+    border: 1px solid var(--wood-mid);
+    color: var(--text);
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    outline: none;
+    width: 100%;
+  }
+  .ctrl-select:focus { border-color: var(--gold-dim); }
+
+  /* Toggle buttons */
+  .toggle-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .tog-btn {
+    flex: 1;
+    padding: 0.3rem 0.2rem;
+    background: var(--surface2);
+    border: 1px solid var(--wood-mid);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    font-family: 'DM Mono', monospace;
+  }
+  .tog-btn.active {
+    background: linear-gradient(145deg, var(--gold-dim), var(--wood-mid));
+    border-color: var(--gold);
+    color: var(--gold-light);
+    box-shadow: 0 0 8px rgba(201,146,42,0.3);
+  }
+
+  /* Octave display */
+  .octave-display {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--gold-light);
+    text-align: center;
+  }
+
+  /* Note name badge */
+  .note-badge {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--gold-dim);
+    min-height: 1.2rem;
+    transition: color 0.1s;
+  }
+  .note-badge.active { color: var(--gold-light); text-shadow: 0 0 10px var(--gold); }
+
+  /* ── Bellows indicator ── */
+  .bellows-bar {
+    height: 6px;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+  .bellows-fill {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold-light), var(--gold-dim));
+    border-radius: 3px;
+    transition: width 0.06s ease-out;
+    box-shadow: 0 0 8px rgba(201,146,42,0.6);
+  }
+
+  /* ── Keyboard ── */
+  .keyboard-section {
+    padding: 1.2rem 1rem 0;
+    position: relative;
+  }
+
+  .keyboard-frame {
+    background: linear-gradient(180deg, #1a1208 0%, #0e0a06 100%);
+    border: 1px solid var(--wood-mid);
+    border-radius: 8px 8px 0 0;
+    padding: 1rem 1rem 0;
+    position: relative;
+    box-shadow: inset 0 6px 20px rgba(0,0,0,0.8);
+  }
+
+  .keys-container {
+    position: relative;
+    height: 150px;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .white-key {
+    position: absolute;
+    bottom: 0;
+    height: 140px;
+    background: linear-gradient(180deg,
+      #e8e0c8 0%, #f5edd8 8%, #f5edd8 75%, #d8cfa8 100%);
+    border: 1px solid #b0a070;
+    border-radius: 0 0 5px 5px;
+    cursor: pointer;
+    transition: background 0.05s;
+    box-shadow:
+      -1px 0 0 rgba(0,0,0,0.15),
+      inset 1px 0 0 rgba(255,255,255,0.5),
+      0 4px 8px rgba(0,0,0,0.5);
+    z-index: 1;
+  }
+  .white-key.pressed {
+    background: linear-gradient(180deg, #c8bea0 0%, #d8d0b0 8%, #d4c898 75%, #b8a870 100%);
+    box-shadow: inset 0 4px 8px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.4);
+    transform: translateY(2px);
+  }
+  .white-key .key-label {
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.45rem;
+    color: #7a6040;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0;
+    line-height: 1.2;
+    pointer-events: none;
+  }
+
+  .black-key {
+    position: absolute;
+    bottom: 0;
+    height: 90px;
+    background: linear-gradient(180deg,
+      #2a1f10 0%, #1a1208 30%, #100d08 100%);
+    border: 1px solid #0a0806;
+    border-radius: 0 0 4px 4px;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.05s;
+    box-shadow:
+      2px 4px 6px rgba(0,0,0,0.8),
+      inset 1px 0 0 rgba(255,255,255,0.06),
+      inset -1px 0 0 rgba(0,0,0,0.4);
+  }
+  .black-key.pressed {
+    background: linear-gradient(180deg, #3a2f18 0%, #2a2010 30%, #1a1608 100%);
+    box-shadow: 1px 2px 3px rgba(0,0,0,0.8), inset 0 2px 4px rgba(0,0,0,0.6);
+    transform: translateY(2px);
+  }
+  .black-key .key-label {
+    position: absolute;
+    bottom: 6px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.4rem;
+    color: rgba(201,146,42,0.5);
+    font-family: 'DM Mono', monospace;
+    pointer-events: none;
+  }
+
+  /* Keyboard shortcut hints */
+  .white-key .kbd-hint {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.5rem;
+    color: rgba(100,70,30,0.5);
+    font-family: 'DM Mono', monospace;
+    pointer-events: none;
+  }
+  .black-key .kbd-hint {
+    position: absolute;
+    top: 8px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.4rem;
+    color: rgba(201,146,42,0.3);
+    font-family: 'DM Mono', monospace;
+    pointer-events: none;
+  }
+
+  /* ── Reed indicators ── */
+  .reed-row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 0.6rem 1rem;
+    background: var(--surface);
+    border-top: 1px solid rgba(201,146,42,0.15);
+  }
+  .reed-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--wood-dark);
+    border: 1px solid var(--wood-mid);
+    transition: all 0.05s;
+  }
+  .reed-dot.active {
+    background: radial-gradient(circle, var(--gold-light), var(--gold));
+    box-shadow: 0 0 6px var(--gold), 0 0 12px rgba(201,146,42,0.4);
+    border-color: var(--gold-light);
+  }
+
+  /* ── Bottom bar ── */
+  .bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1.5rem;
+    background: var(--wood-dark);
+    border-top: 1px solid rgba(201,146,42,0.2);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .kbd-map-info {
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    line-height: 1.8;
+  }
+  .status-pill {
+    background: var(--surface);
+    border: 1px solid var(--wood-mid);
+    border-radius: 20px;
+    padding: 0.2rem 0.8rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+  .status-pill span { color: var(--gold); }
+
+  /* ── Note name display ── */
+  .note-display {
+    text-align: center;
+    padding: 0.5rem;
+    background: var(--surface);
+  }
+  .playing-notes {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.2em;
+    min-height: 1.4rem;
+    transition: color 0.1s;
+  }
+  .playing-notes.has-notes { color: var(--gold-light); }
+
+  /* ── Animations ── */
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .controls-panel { flex-direction: column; }
+    .ctrl-group { min-width: 100%; }
+    .keys-container { height: 120px; }
+    .white-key { height: 110px; }
+    .black-key { height: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-en">Web Harmonium</div>
+  <div class="title-hi">वेब हार्मोनियम</div>
+</header>
+
+<div class="instrument-wrap">
+  <div class="harmonium-body">
+
+    <!-- Reed grill decoration -->
+    <div class="grill-bar" id="grillBar">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+
+      <!-- Volume -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Volume</div>
+        <input type="range" id="volSlider" min="0" max="100" value="80"
+          oninput="setVolumeSlider(this.value)">
+        <div class="stepper" style="justify-content:center;">
+          <div class="stepper-val" id="volDisplay" style="font-size:0.75rem; color:var(--text-dim);">80%</div>
+        </div>
+      </div>
+
+      <!-- Reverb -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Reverb</div>
+        <input type="range" id="reverbSlider" min="0" max="100" value="30"
+          oninput="setReverb(this.value)">
+        <div class="stepper" style="justify-content:center;">
+          <div class="stepper-val" id="reverbDisplay" style="font-size:0.75rem; color:var(--text-dim);">30%</div>
+        </div>
+      </div>
+
+      <!-- Octave -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Octave</div>
+        <div class="stepper">
+          <button class="step-btn" onclick="changeOctave(-1)">−</button>
+          <div class="octave-display" id="octaveDisplay">4</div>
+          <button class="step-btn" onclick="changeOctave(1)">+</button>
+        </div>
+      </div>
+
+      <!-- Transpose -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Transpose</div>
+        <div class="stepper">
+          <button class="step-btn" onclick="changeTranspose(-1)">−</button>
+          <div class="stepper-val" id="transposeDisplay">C</div>
+          <button class="step-btn" onclick="changeTranspose(1)">+</button>
+        </div>
+      </div>
+
+      <!-- Reeds -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Extra Reeds</div>
+        <div class="stepper">
+          <button class="step-btn" onclick="changeReeds(-1)">−</button>
+          <div class="stepper-val" id="reedDisplay">0</div>
+          <button class="step-btn" onclick="changeReeds(1)">+</button>
+        </div>
+      </div>
+
+      <!-- Timbre -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Timbre</div>
+        <select class="ctrl-select" id="timbreSelect" onchange="setTimbre(this.value)">
+          <option value="harmonium">Harmonium</option>
+          <option value="bandoneon">Bandoneon</option>
+          <option value="organ">Pipe Organ</option>
+          <option value="accordion">Accordion</option>
+        </select>
+      </div>
+
+      <!-- Drone -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Drone / Sa</div>
+        <div class="toggle-row">
+          <button class="tog-btn" id="droneBtn" onclick="toggleDrone()">SA</button>
+          <button class="tog-btn" id="dronePa" onclick="toggleDronePa()">PA</button>
+        </div>
+        <div class="stepper" style="margin-top:0.2rem;">
+          <div class="ctrl-label" style="margin:0;">Tune</div>
+          <input type="range" id="droneTune" min="-50" max="50" value="0" style="flex:1;"
+            oninput="updateDroneTune(this.value)">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bellows animation bar -->
+    <div class="bellows-bar">
+      <div class="bellows-fill" id="bellowsFill"></div>
+    </div>
+
+    <!-- Currently playing notes -->
+    <div class="note-display">
+      <div class="playing-notes" id="playingNotes">—</div>
+    </div>
+
+    <!-- Reed dots -->
+    <div class="reed-row" id="reedRow"></div>
+
+    <!-- Keyboard -->
+    <div class="keyboard-section">
+      <div class="keyboard-frame">
+        <div class="keys-container" id="keysContainer"></div>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="bottom-bar">
+      <div class="kbd-map-info">
+        WHITE: <strong style="color:var(--gold-dim);">A S D F G H J K L ;</strong> &nbsp;|&nbsp;
+        BLACK: <strong style="color:var(--gold-dim);">W E &nbsp;T Y U &nbsp;O P</strong><br>
+        Octave: <strong style="color:var(--gold-dim);">Z / X</strong> &nbsp;|&nbsp;
+        Transpose: <strong style="color:var(--gold-dim);">[ ]</strong> &nbsp;|&nbsp;
+        Drone: <strong style="color:var(--gold-dim);">Space</strong>
+      </div>
+      <div class="status-pill" id="statusPill">
+        <span id="statusText">Ready</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────
+//  Web Harmonium — Fixed Audio Engine
+// ─────────────────────────────────────────────────────────
+
+let ctx = null;
+let masterGain, reverbGain, dryGain, convolver;
+let activeNodes = {};   // noteId -> { oscs:[], gainNode }
+let keyElements  = {};  // noteId -> DOM element
+
+let currentOctave  = 4;
+let transposeSteps = 0;
+let extraReeds     = 0;
+let currentTimbre  = 'harmonium';
+let droneOn = false, dronePaOn = false;
+let droneNode = null, dronePaNode = null;
+let droneTuneOffset = 0;
+
+const NOTE_NAMES      = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const TRANSPOSE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+const WHITE_KEY_SEMIS = [0,2,4,5,7,9,11, 12,14,16,17,19,21,23];
+const WHITE_SHORTCUTS = ['a','s','d','f','g','h','j', 'k','l',';',"'",',','.','/']; 
+
+const BLACK_POSITIONS = [
+  { wi:0,  semi:1,  sc:'w' },
+  { wi:1,  semi:3,  sc:'e' },
+  { wi:3,  semi:6,  sc:'t' },
+  { wi:4,  semi:8,  sc:'y' },
+  { wi:5,  semi:10, sc:'u' },
+  { wi:7,  semi:13, sc:'o' },
+  { wi:8,  semi:15, sc:'p' },
+  { wi:10, semi:18, sc:''  },
+  { wi:11, semi:20, sc:''  },
+  { wi:12, semi:22, sc:''  },
+];
+
+// computer keyboard -> semitone map
+const KB_MAP = {
+  // white keys
+  'a':0,'s':2,'d':4,'f':5,'g':7,'h':9,'j':11,
+  'k':12,'l':14,';':16,"'":17,',':19,'.':21,'/':23,
+  // black keys
+  'w':1,'e':3,'t':6,'y':8,'u':10,'o':13,'p':15
+};
+// semi -> noteId prefix (white or black)
+const SEMI_IS_BLACK = new Set([1,3,6,8,10,13,15,18,20,22]);
+
+// Timbre: [harmonic_number, amplitude]  (will be normalised)
+const TIMBRES = {
+  harmonium:  [[1,1.0],[2,0.5],[3,0.3],[4,0.15],[5,0.08],[6,0.04]],
+  bandoneon:  [[1,1.0],[2,0.7],[3,0.6],[4,0.35],[5,0.2],[7,0.1]],
+  organ:      [[1,1.0],[2,0.5],[3,0.33],[4,0.25],[6,0.17],[8,0.125]],
+  accordion:  [[1,1.0],[2,0.8],[3,0.55],[4,0.3],[5,0.15]],
+};
+
+// ── Audio init (called on first interaction) ──────────────
+function initAudio() {
+  if (ctx) {
+    // browsers may suspend context; resume it
+    if (ctx.state === 'suspended') ctx.resume();
+    return;
+  }
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+  masterGain = ctx.createGain();
+  masterGain.gain.value = 0.75;
+
+  dryGain = ctx.createGain();
+  dryGain.gain.value = 1.0;
+
+  reverbGain = ctx.createGain();
+  reverbGain.gain.value = 0.25;
+
+  convolver = ctx.createConvolver();
+  convolver.buffer = makeImpulse(1.8);
+
+  // routing: master -> dry -> out
+  //          master -> convolver -> reverbGain -> out
+  masterGain.connect(dryGain);
+  dryGain.connect(ctx.destination);
+
+  masterGain.connect(convolver);
+  convolver.connect(reverbGain);
+  reverbGain.connect(ctx.destination);
+
+  setStatus('♪ Playing');
+}
+
+function makeImpulse(secs) {
+  const rate   = ctx.sampleRate;
+  const len    = Math.floor(rate * secs);
+  const buf    = ctx.createBuffer(2, len, rate);
+  for (let c = 0; c < 2; c++) {
+    const ch = buf.getChannelData(c);
+    for (let i = 0; i < len; i++)
+      ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.2);
+  }
+  return buf;
+}
+
+// ── Note frequency ────────────────────────────────────────
+function freqFromMidi(midi) {
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+function midiForSemi(semi) {
+  // semi 0 = C4 when octave=4, transpose=0
+  return 48 + semi + (currentOctave - 4) * 12 + transposeSteps;
+}
+
+// ── Play / Stop ───────────────────────────────────────────
+function playNote(noteId, semi) {
+  initAudio();
+  if (activeNodes[noteId]) return;          // already playing
+
+  const freq     = freqFromMidi(midiForSemi(semi));
+  const partials = TIMBRES[currentTimbre];
+
+  // normalise amplitudes so total power ≈ 1
+  const totalAmp = partials.reduce((s, [,a]) => s + a, 0);
+
+  const noteGain = ctx.createGain();
+  noteGain.gain.setValueAtTime(0, ctx.currentTime);
+  noteGain.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 0.02); // attack
+  noteGain.connect(masterGain);
+
+  const oscs = [];
+
+  function addOsc(frequency, amplitude) {
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = frequency;
+    const g = ctx.createGain();
+    g.gain.value = amplitude / totalAmp;
+    osc.connect(g);
+    g.connect(noteGain);
+    osc.start();
+    oscs.push(osc);
+  }
+
+  // Main reed
+  partials.forEach(([n, a]) => addOsc(freq * n, a));
+
+  // Extra detuned reeds
+  for (let r = 0; r < extraReeds; r++) {
+    const cents  = (r % 2 === 0 ? 1 : -1) * (r + 1) * 5;
+    const detune = Math.pow(2, cents / 1200);
+    partials.forEach(([n, a]) => addOsc(freq * n * detune, a * 0.55));
+  }
+
+  activeNodes[noteId] = { oscs, gainNode: noteGain };
+  highlightKey(noteId, true);
+  updateBellows();
+  updateNoteDisplay();
+  flashReedDots();
+}
+
+function stopNote(noteId) {
+  const node = activeNodes[noteId];
+  if (!node) return;
+  const { oscs, gainNode } = node;
+
+  gainNode.gain.setTargetAtTime(0, ctx.currentTime, 0.05); // release
+  setTimeout(() => {
+    oscs.forEach(o => { try { o.stop(); o.disconnect(); } catch(_){} });
+    gainNode.disconnect();
+  }, 400);
+
+  delete activeNodes[noteId];
+  highlightKey(noteId, false);
+  updateBellows();
+  updateNoteDisplay();
+  flashReedDots();
+}
+
+// ── Drone ─────────────────────────────────────────────────
+function toggleDrone() {
+  initAudio();
+  droneOn = !droneOn;
+  document.getElementById('droneBtn').classList.toggle('active', droneOn);
+  droneOn ? startDroneNode('sa') : killDroneNode('sa');
+}
+function toggleDronePa() {
+  initAudio();
+  dronePaOn = !dronePaOn;
+  document.getElementById('dronePa').classList.toggle('active', dronePaOn);
+  dronePaOn ? startDroneNode('pa') : killDroneNode('pa');
+}
+function startDroneNode(type) {
+  const midi  = (type === 'sa' ? 48 : 55) + transposeSteps + droneTuneOffset / 100;
+  const freq  = freqFromMidi(midi);
+  const parts = TIMBRES[currentTimbre];
+  const total = parts.reduce((s,[,a]) => s+a, 0);
+
+  const g = ctx.createGain();
+  g.gain.value = 0.18;
+  g.connect(masterGain);
+  const oscs = [];
+  parts.forEach(([n, a]) => {
+    const o = ctx.createOscillator();
+    o.type = 'sine';
+    o.frequency.value = freq * n;
+    const og = ctx.createGain();
+    og.gain.value = a / total;
+    o.connect(og); og.connect(g); o.start();
+    oscs.push(o);
+  });
+  if (type === 'sa') droneNode   = { oscs, gainNode: g };
+  else               dronePaNode = { oscs, gainNode: g };
+}
+function killDroneNode(type) {
+  const node = type === 'sa' ? droneNode : dronePaNode;
+  if (!node) return;
+  node.gainNode.gain.setTargetAtTime(0, ctx.currentTime, 0.1);
+  setTimeout(() => { node.oscs.forEach(o => { try { o.stop(); } catch(_){} }); node.gainNode.disconnect(); }, 600);
+  if (type === 'sa') droneNode = null; else dronePaNode = null;
+}
+function updateDroneTune(v) {
+  droneTuneOffset = parseInt(v);
+  if (droneOn)   { killDroneNode('sa'); startDroneNode('sa'); }
+  if (dronePaOn) { killDroneNode('pa'); startDroneNode('pa'); }
+}
+
+// ── Controls ──────────────────────────────────────────────
+function setVolumeSlider(v) {
+  initAudio();
+  if (masterGain) masterGain.gain.value = v / 100;
+  document.getElementById('volDisplay').textContent = v + '%';
+  updateSliderGradient('volSlider', v, 100);
+}
+function setReverb(v) {
+  const wet = v / 100;
+  document.getElementById('reverbDisplay').textContent = v + '%';
+  if (reverbGain) reverbGain.gain.value = wet * 0.55;
+  if (dryGain)    dryGain.gain.value    = 1 - wet * 0.25;
+  if (ctx) convolver.buffer = makeImpulse(0.5 + wet * 3.5);
+  updateSliderGradient('reverbSlider', v, 100);
+}
+function updateSliderGradient(id, val, max) {
+  const el  = document.getElementById(id);
+  const pct = (val / max) * 100;
+  el.style.background = `linear-gradient(90deg, var(--gold) ${pct}%, rgba(255,255,255,0.08) 0)`;
+}
+function changeOctave(d) {
+  currentOctave = Math.max(2, Math.min(6, currentOctave + d));
+  document.getElementById('octaveDisplay').textContent = currentOctave;
+}
+function changeTranspose(d) {
+  transposeSteps = ((transposeSteps + d) % 12 + 12) % 12;
+  document.getElementById('transposeDisplay').textContent = TRANSPOSE_NAMES[transposeSteps];
+  if (droneOn)   { killDroneNode('sa'); startDroneNode('sa'); }
+  if (dronePaOn) { killDroneNode('pa'); startDroneNode('pa'); }
+}
+function changeReeds(d) {
+  extraReeds = Math.max(0, Math.min(4, extraReeds + d));
+  document.getElementById('reedDisplay').textContent = extraReeds;
+  buildReedDots();
+}
+function setTimbre(v) { currentTimbre = v; }
+
+// ── Bellows ───────────────────────────────────────────────
+function updateBellows() {
+  const n   = Object.keys(activeNodes).length;
+  const pct = Math.min(n * 18, 92);
+  document.getElementById('bellowsFill').style.width = pct + '%';
+}
+
+// ── Reed dots ─────────────────────────────────────────────
+function buildReedDots() {
+  const row = document.getElementById('reedRow');
+  row.innerHTML = '';
+  const total = 28 + extraReeds * 10;
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'reed-dot';
+    row.appendChild(d);
+  }
+}
+function flashReedDots() {
+  const active = Object.keys(activeNodes).length > 0;
+  document.querySelectorAll('.reed-dot').forEach(d => {
+    d.classList.toggle('active', active && Math.random() > 0.45);
+  });
+}
+
+// ── Note name display ─────────────────────────────────────
+function updateNoteDisplay() {
+  const el   = document.getElementById('playingNotes');
+  const keys = Object.keys(activeNodes);
+  if (!keys.length) { el.textContent = '—'; el.classList.remove('has-notes'); return; }
+  const names = keys.map(k => {
+    const semi = parseInt(k.split('_')[1]);
+    const midi = midiForSemi(semi);
+    return NOTE_NAMES[((midi % 12) + 12) % 12] + Math.floor(midi / 12 - 1);
+  });
+  el.textContent = names.join('  ');
+  el.classList.add('has-notes');
+}
+
+// ── Status ────────────────────────────────────────────────
+function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
+
+// ── Key highlight (via stored DOM refs) ───────────────────
+function highlightKey(noteId, on) {
+  const el = keyElements[noteId];
+  if (el) el.classList.toggle('pressed', on);
+}
+
+// ── Grill decoration ──────────────────────────────────────
+function buildGrill() {
+  const bar = document.getElementById('grillBar');
+  for (let i = 0; i < 60; i++) {
+    const h = document.createElement('div');
+    h.className = 'grill-hole';
+    bar.appendChild(h);
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+//  Keyboard Builder
+// ─────────────────────────────────────────────────────────
+function buildKeyboard() {
+  const container = document.getElementById('keysContainer');
+  container.innerHTML = '';
+  keyElements = {};
+
+  const numWhite = WHITE_KEY_SEMIS.length; // 14
+  const whiteW   = 100 / numWhite;
+
+  // ── White keys ──
+  WHITE_KEY_SEMIS.forEach((semi, wi) => {
+    const noteId = 'white_' + semi;
+    const el     = document.createElement('div');
+    el.className = 'white-key';
+    el.style.left  = (wi * whiteW) + '%';
+    el.style.width = whiteW + '%';
+    el.dataset.semi = semi;
+
+    // Note name label
+    const noteIdx = semi % 12;
+    const oct     = currentOctave + Math.floor(semi / 12);
+    const lbl = document.createElement('div');
+    lbl.className = 'key-label';
+    lbl.textContent = NOTE_NAMES[noteIdx] + oct;
+    el.appendChild(lbl);
+
+    // Keyboard shortcut hint
+    if (WHITE_SHORTCUTS[wi]) {
+      const hint = document.createElement('div');
+      hint.className = 'kbd-hint';
+      hint.textContent = WHITE_SHORTCUTS[wi].toUpperCase();
+      el.appendChild(hint);
+    }
+
+    // Mouse/touch events
+    el.addEventListener('mousedown',  e => { e.preventDefault(); playNote(noteId, semi); });
+    el.addEventListener('touchstart', e => { e.preventDefault(); playNote(noteId, semi); }, { passive: false });
+    el.addEventListener('mouseup',    ()  => stopNote(noteId));
+    el.addEventListener('touchend',   e  => { e.preventDefault(); stopNote(noteId); });
+    el.addEventListener('mouseleave', ()  => { if (activeNodes[noteId]) stopNote(noteId); });
+
+    keyElements[noteId] = el;
+    container.appendChild(el);
+  });
+
+  // ── Black keys ──
+  const bkW = whiteW * 0.60;
+  BLACK_POSITIONS.forEach(({ wi, semi, sc }) => {
+    const noteId = 'black_' + semi;
+    const el     = document.createElement('div');
+    el.className = 'black-key';
+    const leftPct = (wi + 1) * whiteW - bkW / 2;
+    el.style.left  = leftPct + '%';
+    el.style.width = bkW + '%';
+    el.dataset.semi = semi;
+
+    const lbl = document.createElement('div');
+    lbl.className = 'key-label';
+    lbl.textContent = NOTE_NAMES[semi % 12];
+    el.appendChild(lbl);
+
+    if (sc) {
+      const hint = document.createElement('div');
+      hint.className = 'kbd-hint';
+      hint.textContent = sc.toUpperCase();
+      el.appendChild(hint);
+    }
+
+    el.addEventListener('mousedown',  e => { e.preventDefault(); playNote(noteId, semi); });
+    el.addEventListener('touchstart', e => { e.preventDefault(); playNote(noteId, semi); }, { passive: false });
+    el.addEventListener('mouseup',    ()  => stopNote(noteId));
+    el.addEventListener('touchend',   e  => { e.preventDefault(); stopNote(noteId); });
+    el.addEventListener('mouseleave', ()  => { if (activeNodes[noteId]) stopNote(noteId); });
+
+    keyElements[noteId] = el;
+    container.appendChild(el);
+  });
+}
+
+// ─────────────────────────────────────────────────────────
+//  Computer Keyboard Input
+// ─────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  const k = e.key === ' ' ? ' ' : e.key.toLowerCase();
+
+  if (k === ' ')   { e.preventDefault(); toggleDrone(); return; }
+  if (k === 'z')   { changeOctave(-1);   return; }
+  if (k === 'x')   { changeOctave(1);    return; }
+  if (k === '[')   { changeTranspose(-1);return; }
+  if (k === ']')   { changeTranspose(1); return; }
+
+  if (KB_MAP[k] !== undefined) {
+    const semi   = KB_MAP[k];
+    const noteId = (SEMI_IS_BLACK.has(semi) ? 'black_' : 'white_') + semi;
+    playNote(noteId, semi);
+  }
+});
+
+document.addEventListener('keyup', e => {
+  const k = e.key.toLowerCase();
+  if (KB_MAP[k] !== undefined) {
+    const semi   = KB_MAP[k];
+    const noteId = (SEMI_IS_BLACK.has(semi) ? 'black_' : 'white_') + semi;
+    stopNote(noteId);
+  }
+});
+
+// ─────────────────────────────────────────────────────────
+//  Init
+// ─────────────────────────────────────────────────────────
+buildGrill();
+buildReedDots();
+buildKeyboard();
+updateSliderGradient('volSlider',    80, 100);
+updateSliderGradient('reverbSlider', 30, 100);
+setStatus('Click a key to begin');
+</script>
+</body>
+</html>
